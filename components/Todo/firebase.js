@@ -34,27 +34,28 @@ export const getDocsHook = async (collectionRef) => {
   return data;
 };
 
-export const deleteDocsHook = (id, collectionRef) => {
+export const deleteDocsHook = (collectionRef, id) => {
   // need doc id
   const docRef = doc(collectionRef, id);
   deleteDoc(docRef);
 };
 
+// this can work for creating a tab too
 export const addDocHook = (data, collectionRef) => {
   // add an object, to the collection you select
-  addDoc(collectionRef, data);
+  addDoc(data, collectionRef);
 };
 
-export const deleteTab = async (tab, collectionRef, stateData) => {
+export const deleteTab = async (collectionRef, tabKey) => {
   // i think we can do a loop grab all ids from the tab and then delete
   // call the deletedocshooks with the id
   const data = await getDocsHook(collectionRef);
-  console.log(data);
-  // filter out the tab
-  const filteredTabs = data.filter((doc) => doc.tab === tab);
-  console.log(filteredTabs);
+
+  // filter out the tabs we want to delete
+  const filteredTabs = data.filter((doc) => doc.tab === tabKey);
+
   filteredTabs.forEach((reminder) => {
-    deleteDocsHook(reminder.firebaseId, collectionRef);
+    deleteDocsHook(collectionRef, reminder.firebaseId);
   });
 };
 

@@ -1,17 +1,23 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
-import { TodoContext } from "../DataProvider";
+import React, { useState, useEffect, useRef } from "react";
+
+import { useQueryHook, useMutationHook } from "../useHooks";
+import { addDocHook } from "../firebase";
 
 import { Input, Flex } from "@chakra-ui/react";
 
 const ReminderInput = ({ setToggleReminder }) => {
-  const { createReminder, tab } = useContext(TodoContext);
+  const { mutate } = useMutationHook(addDocHook);
+
+  const { tabKey } = useQueryHook();
+
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef();
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
     if (inputValue) {
-      createReminder(tab, inputValue);
+      const newReminder = { tab: tabKey, reminder: inputValue };
+      mutate(newReminder);
       setInputValue("");
       setToggleReminder.off();
     }

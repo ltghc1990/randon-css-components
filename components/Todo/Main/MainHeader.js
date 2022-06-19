@@ -1,12 +1,11 @@
-import React, { useContext } from "react";
+import { useQueryHook } from "../useHooks";
 
 import { Heading, Flex, Box } from "@chakra-ui/react";
-import { TodoContext } from "../DataProvider";
 
 const MainHeader = ({ setToggleReminder }) => {
-  const { tab } = useContext(TodoContext);
+  const { tabKey } = useQueryHook();
 
-  let tabName = tab === "all" ? "Reminders" : tab;
+  let tabName = tabKey === "all" ? "Reminders" : tabKey;
 
   return (
     <Flex justify={"space-between"} align="center" my={{ base: 3, md: 4 }}>

@@ -9,3 +9,7 @@ what i could do instead is becuase we are using a context provider, i can jsut c
 <!-- work on the router, right now im pushing a hardcoded link on the tabs
 the hardcoded lniks are also in the dataProvider to set the current tab.
 make it so that it -->
+
+<!-- opening and closing the sidebar or the add new reminder causes a refetch from react-query because its remounting.. -->
+
+<!-- the add new reminder is rerendering because it needs the tabkey from the query. a easy fix is to pass the tabkey as a prop  -->

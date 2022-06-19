@@ -11,10 +11,10 @@ function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider>
       <QueryClientProvider client={queryClient}>
-        <DataProvider>
-          <Component {...pageProps} />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </DataProvider>
+        {/* <DataProvider> */}
+        <Component {...pageProps} />
+        <ReactQueryDevtools initialIsOpen={false} />
+        {/* </DataProvider> */}
       </QueryClientProvider>
     </ChakraProvider>
   );

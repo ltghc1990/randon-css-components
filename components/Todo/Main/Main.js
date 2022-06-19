@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { TodoContext } from "../DataProvider";
+import { useQueryHook, useMutationHook } from "../useHooks";
+import { deleteTab } from "../firebase";
 
 import MainHeader from "./MainHeader";
 import ToggleBar from "./ToggleBar";
@@ -8,10 +8,12 @@ import ReminderInput from "./ReminderInput";
 import { Box, Text, Flex } from "@chakra-ui/react";
 
 const Main = ({ toggleReminder, setToggleReminder, onToggle }) => {
-  const { deleteTab, tabsLength, tab } = useContext(TodoContext);
+  const { tabsLength, tabIndex, tabKey } = useQueryHook();
+
+  const { mutate } = useMutationHook(deleteTab);
 
   let showDelete;
-  if (tabsLength > 1 && tab !== "all") {
+  if (tabsLength > 1 && tabKey !== "all") {
     showDelete = true;
   }
 
@@ -29,7 +31,7 @@ const Main = ({ toggleReminder, setToggleReminder, onToggle }) => {
 
       <Flex align="center" py={4} position={"relative"} className="mt-auto">
         {showDelete && (
-          <Box position="absolute" right={0} onClick={deleteTab}>
+          <Box position="absolute" right={0} onClick={() => mutate(tabKey)}>
             <DeleteList />
           </Box>
         )}

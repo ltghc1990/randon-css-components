@@ -1,52 +1,58 @@
-import React, { useContext } from "react";
-import { TodoContext } from "../DataProvider";
+import { useQueryHook, useMutationHook } from "../useHooks";
+import { deleteDocsHook } from "../firebase";
 
 import BadgeComp from "./BadgeComp";
 
 import { Flex, Text, Box } from "@chakra-ui/react";
 
 const Reminders = () => {
-  const { tab, allReminders, reminders, deleteReminder } =
-    useContext(TodoContext);
+  // data = all object reminders
+  const { tabKey, data, filteredReminders } = useQueryHook();
 
-  const whatToShow = tab === "all" ? allReminders : reminders;
+  const { mutate } = useMutationHook(deleteDocsHook);
+
+  const whatToShow = tabKey === "all" ? data : filteredReminders;
 
   if (!whatToShow) {
     return <div>Could not return reminders...</div>;
   }
 
-  if (whatToShow.length === 0) {
+  //   the first index is the only one that can be an emtpy tab
+  if (!whatToShow[0].reminder) {
     return <div className="my-2">No reminders!</div>;
   }
   return (
     <div className="py-8">
       {whatToShow.map((reminder) => {
-        return (
-          <Flex
-            justify="space-between"
-            align="center"
-            py={{ base: 2 }}
-            borderBottom="1px solid"
-            borderBottomColor="gray.300"
-            key={reminder.id}
-          >
-            <Text fontSize={{ base: "sm", md: "md" }} className="capitalize">
-              {reminder.reminder}
-              {tab === "all" && reminder.createdTab !== tab && (
-                <BadgeComp text={reminder.createdTab} />
-              )}
-            </Text>
-
-            <Box
-              color="gray.600"
-              _hover={{ color: "gray.800" }}
-              className="border-2 border-white "
-              onClick={() => deleteReminder(reminder.id)}
+        if (reminder.reminder)
+          return (
+            <Flex
+              justify="space-between"
+              align="center"
+              py={{ base: 2 }}
+              borderBottom="1px solid"
+              borderBottomColor="gray.300"
+              key={reminder.firebaseId}
             >
-              <DeleteIcon />
-            </Box>
-          </Flex>
-        );
+              <Text fontSize={{ base: "sm", md: "md" }} className="capitalize">
+                {reminder.reminder}
+                {tabKey === "all" && reminder.tab !== tabKey && (
+                  <BadgeComp text={reminder.tab} />
+                )}
+              </Text>
+
+              <Box
+                color="gray.600"
+                _hover={{ color: "gray.800" }}
+                className="border-2 border-white "
+                onClick={() => {
+                  mutate(reminder.firebaseId);
+                }}
+              >
+                <DeleteIcon />
+              </Box>
+            </Flex>
+          );
       })}
     </div>
   );
