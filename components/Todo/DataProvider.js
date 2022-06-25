@@ -1,51 +1,54 @@
-import react, { useState, createContext, useEffect } from "react";
-import { useRouter } from "next/router";
-import { faker } from "@faker-js/faker";
-// query param from router determines our current tab.
-// we also set the current tab after we add or delete the tabs
+import { useState, createContext } from "react";
+
 import { useQuery } from "react-query";
 
-import { getCollectionRef, getDocsHook } from "./firebase";
+import { getCollectionRef, getDocsHook, getByRecent } from "./firebase";
 
 export const TodoContext = createContext();
 
 const DataProvider = ({ children }) => {
-  const router = useRouter();
-  const { query } = router;
+  const [tabIndex, setTabIndex] = useState(0);
+
+  // setServerData should only be used inside onSuccess, our mutations to the server data should cause it to run, rerendering our data
+  const [serverData, setServerData] = useState({});
 
   const collectionRef = getCollectionRef("Reminders");
 
-  const { data: reminders, isError } = useQuery("reminders", () =>
-    getDocsHook(collectionRef)
+  const { data: allReminders, isError } = useQuery(
+    "firebaseData",
+    // () => getDocsHook(collectionRef),
+    getByRecent,
+    {
+      // staleTime: Infinity,
+      onSuccess: (reminders) => {
+        const tabsSet = new Set(
+          reminders?.map((reminder) => reminder.tab) ?? []
+        );
+        const tabs = [...tabsSet];
+        const tabsLength = tabs.length;
+        // this is data that we get from the server
+        setServerData({ tabs, tabsLength });
+      },
+    }
   );
-  // derive values from the data
+  // state and server state should be kept separate.
+  // once we have the server data from on success, we are using local state to format and determine what to show.
+  // tabIndex,tabKey, filtereReminders is really just ui local state. the tabs and the tabs length can only be determined thru the server state
 
-  // use a set for the tabs?
-  const tabsSet = new Set(reminders?.map((reminder) => reminder.tab) ?? []);
-  const tabs = [...tabsSet];
-  const tabsLength = tabs.length;
-  // current tab value should come from the router
-  const tab = query.tab ? query.tab : 0;
-
-  // can make the reactquery hooks on one page that we can call to make it easier to follow.
-
-  // i think i can also do a onSuccess and set abunch of querys for the data that we dereive from the initialQuery.
-  // something like {enabled: }
-
-  //tabs, tabsLength, tab)
+  // since this is local state it needs to be out of the onsuccess which only rerenders if a mutation occurs. the onsuccess will fire off only when the serverside data changes and not when our local state changes.
+  const tabKey = serverData?.tabs?.[tabIndex];
+  // can also put the allreminders in the state, but its going to render if a mutation happens so this is fine too
+  const filteredReminders = allReminders?.filter((item) => item.tab === tabKey);
 
   return (
     <TodoContext.Provider
       value={{
-        // createTab,
-        // deleteTab,
-        // createReminder,
-        // deleteReminder,
-        tab,
-        tabs,
-        tabsLength,
-        reminders,
-        // allReminders,
+        ...serverData,
+        tabIndex,
+        tabKey,
+        filteredReminders,
+        allReminders,
+        setTabIndex,
       }}
     >
       {children}
@@ -54,8 +57,3 @@ const DataProvider = ({ children }) => {
 };
 
 export default DataProvider;
-
-// tabslength needed to select the tab after it is created
-// tab is need for the main header to display current tab property
-
-// ---------------------------------------------------------------------------

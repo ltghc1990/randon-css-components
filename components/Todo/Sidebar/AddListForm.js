@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
+
+import { TodoContext } from "../DataProvider";
 
 import { useMutationHook } from "../useHooks";
 import { addDocHook } from "../firebase";
@@ -8,6 +10,7 @@ import { Input, Flex } from "@chakra-ui/react";
 import { FormControl, FormErrorMessage } from "@chakra-ui/react";
 
 const AddListForm = ({ setShowInput }) => {
+  const { setTabIndex, tabsLength } = useContext(TodoContext);
   const { mutate } = useMutationHook(addDocHook);
 
   const inputRef = useRef();
@@ -23,6 +26,7 @@ const AddListForm = ({ setShowInput }) => {
     e.preventDefault();
     if (!isError) {
       mutate({ tab: inputValue });
+      setTabIndex(tabsLength);
       setInputValue("");
       setShowInput.off();
     }

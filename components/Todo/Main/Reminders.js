@@ -1,28 +1,31 @@
-import { useQueryHook, useMutationHook } from "../useHooks";
+import { useContext } from "react";
+
+import { useMutationHook } from "../useHooks";
 import { deleteDocsHook } from "../firebase";
+
+import { TodoContext } from "../DataProvider";
 
 import BadgeComp from "./BadgeComp";
 
 import { Flex, Text, Box } from "@chakra-ui/react";
 
 const Reminders = () => {
-  // data = all object reminders
-  const { tabKey, data, filteredReminders } = useQueryHook();
+  const { tabKey, allReminders, filteredReminders } = useContext(TodoContext);
 
   const { mutate } = useMutationHook(deleteDocsHook);
 
-  const whatToShow = tabKey === "all" ? data : filteredReminders;
+  const whatToShow = tabKey === "all" ? allReminders : filteredReminders;
 
   if (!whatToShow) {
-    return <div>Could not return reminders...</div>;
+    return <div className="pt-8 pb-2">Could not return reminders...</div>;
   }
 
   //   the first index is the only one that can be an emtpy tab
-  if (!whatToShow[0].reminder) {
-    return <div className="my-2">No reminders!</div>;
+  if (!whatToShow[0]?.reminder && whatToShow.length < 2) {
+    return <div className="pt-8 pb-2">No reminders!</div>;
   }
   return (
-    <div className="py-8">
+    <div className="pt-8 pb-2">
       {whatToShow.map((reminder) => {
         if (reminder.reminder)
           return (

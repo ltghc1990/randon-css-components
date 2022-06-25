@@ -1,5 +1,7 @@
-import Link from "next/link";
-import { useQueryHook, useRouterHook, useTabHook } from "../useHooks";
+import { TodoContext } from "../DataProvider";
+import { useContext } from "react";
+
+import { useTabHook } from "../useHooks";
 import AddListForm from "./AddListForm";
 
 // chakra stuff
@@ -7,8 +9,7 @@ import { Box, Text, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
 const Sidebar = ({ setToggleReminder }) => {
-  const { tabIndex, tabs } = useQueryHook();
-  const { pushLink } = useRouterHook();
+  const { tabIndex, tabs, setTabIndex } = useContext(TodoContext);
 
   const selectedStyle = "bg-gray-600 text-gray-100";
 
@@ -33,18 +34,22 @@ const Sidebar = ({ setToggleReminder }) => {
     >
       <Flex flexDirection="column" flexWrap="wrap">
         {tabs?.map((tab, index) => {
-          const linkObj = pushLink("tab", index);
           return (
-            <Link href={linkObj} key={index}>
+            <div
+              onClick={() => {
+                setTabIndex(index);
+              }}
+              key={index}
+            >
               <a
                 onClick={setToggleReminder.off}
                 className={`${
                   tabIndex == index && selectedStyle
-                } py-2 pl-6 capitalize hover:text-gray-100`}
+                } block py-2 pl-6 capitalize hover:text-gray-100 cursor-pointer`}
               >
                 {tab}
               </a>
-            </Link>
+            </div>
           );
         })}
       </Flex>

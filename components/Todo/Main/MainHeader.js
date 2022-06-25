@@ -1,9 +1,10 @@
-import { useQueryHook } from "../useHooks";
+import { useContext } from "react";
+import { TodoContext } from "../DataProvider";
 
 import { Heading, Flex, Box } from "@chakra-ui/react";
 
 const MainHeader = ({ setToggleReminder }) => {
-  const { tabKey } = useQueryHook();
+  const { tabKey } = useContext(TodoContext);
 
   let tabName = tabKey === "all" ? "Reminders" : tabKey;
 

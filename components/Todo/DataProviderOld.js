@@ -1,6 +1,9 @@
 import react, { useState, createContext } from "react";
 import { useRouter } from "next/router";
 import { faker } from "@faker-js/faker";
+// old provider where the data structure is an object in object.
+// problem with this is that we have to format it into an array to do array methods and then format it back.
+
 // query param from router determines our current tab.
 // we also set the current tab after we add or delete the tabs
 

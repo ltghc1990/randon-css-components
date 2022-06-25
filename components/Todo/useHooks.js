@@ -33,29 +33,48 @@ const useBooleanHook = (boolean) => {
 // dont even need to create this since its an import from chakra
 
 // variable name should be more specific since we can have multiple useQueryHooks for different things
-export const useQueryHook = () => {
-  const router = useRouter();
-  // need to router for the tab index
-  const { query } = router;
+// export const useQueryHook = () => {
+//   const router = useRouter();
+//   // need to router for the tab index
+//   const { query } = router;
 
-  const collectionRef = getCollectionRef("Reminders");
+//   const collectionRef = getCollectionRef("Reminders");
 
-  const { data, isLoading } = useQuery(["firebaseData"], () =>
-    getDocsHook(collectionRef)
-  );
+//   const { data, isLoading } = useQuery(["firebaseData"], () =>
+//     getDocsHook(collectionRef)
+//   );
 
-  // i want to parse the data here
-  // use guards on the array functions to prevent errors
+//   // i want to parse the data here
+//   // use guards on the array functions to prevent errors
 
-  const tabSet = new Set(data?.map((item) => item.tab));
-  const tabs = [...tabSet];
+//   const tabSet = new Set(data?.map((item) => item.tab));
+//   const tabs = [...tabSet];
+//   const tabsLength = tabs.length;
+//   const tabIndex = query.tab ? query.tab : 0;
+//   const tabKey = tabs[tabIndex];
+//   // filter the reminders by tab
+//   const filteredReminders = data?.filter((item) => item.tab === tabKey);
+
+//   return { tabs, tabsLength, tabIndex, data, tabKey, filteredReminders };
+// };
+
+export const reduceData = (reminders) => {
+  const tabsSet = new Set(reminders?.map((reminder) => reminder.tab) ?? []);
+  const tabs = [...tabsSet];
   const tabsLength = tabs.length;
-  const tabIndex = query.tab ? query.tab : 0;
+  // current tab value should come from the router
+  const tabIndex = query.tab ? querytab : 0;
   const tabKey = tabs[tabIndex];
-  // filter the reminders by tab
-  const filteredReminders = data?.filter((item) => item.tab === tabKey);
 
-  return { tabs, tabsLength, tabIndex, data, tabKey, filteredReminders };
+  return { tabs, tabsLength, tabIndex, tabKey, reminders };
+};
+
+export const useReduceDataQuery = () => {
+  const router = useRouter();
+  const { query } = router;
+  return useQuery(["firebaseData", query.tab ? querytab : 0], () =>
+    reduceData()
+  );
 };
 
 export const useRouterHook = () => {
@@ -89,7 +108,6 @@ export const useMutationHook = (callBack) => {
       onSuccess: () => {
         console.log("muatation successful");
         queryClient.invalidateQueries(["firebaseData"]);
-        //invalidating query key doesnt work right now...
       },
     }
   );

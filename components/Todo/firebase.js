@@ -7,6 +7,9 @@ import {
   updateDoc,
   doc,
   deleteDoc,
+  serverTimestamp,
+  query,
+  orderBy,
 } from "firebase/firestore";
 
 import { faker } from "@faker-js/faker";
@@ -41,9 +44,12 @@ export const deleteDocsHook = (collectionRef, id) => {
 };
 
 // this can work for creating a tab too
-export const addDocHook = (data, collectionRef) => {
-  // add an object, to the collection you select
-  addDoc(data, collectionRef);
+export const addDocHook = (collectionRef, data) => {
+  // add an object, to the collection you select\
+  const newObject = { ...data, createdAt: serverTimestamp() };
+  console.log(newObject);
+
+  addDoc(collectionRef, newObject);
 };
 
 export const deleteTab = async (collectionRef, tabKey) => {
@@ -74,3 +80,21 @@ const addFakeData = (number, tab) => {
 };
 
 // addFakeData(4, "work");
+// need to sort or else everytime we add tabs its going to arrange in a random order.
+
+export const getByRecent = async () => {
+  const colRef = collection(db, "Reminders");
+
+  const q = query(colRef, orderBy("createdAt"));
+
+  const response = await getDocs(q);
+
+  const data = response.docs.map((item) => {
+    return {
+      firebaseId: item.id,
+      ...item.data(),
+    };
+  });
+
+  return data;
+};
