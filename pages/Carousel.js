@@ -13,19 +13,13 @@ const Carousel = () => {
   const { width } = borderBox || { width: 0 };
 
   const [count, setCount] = useState(1);
-  // store previous count without using ref + useEffect
-  const [prevCount, setPrevCount] = useState([null, count]);
-
-  // a continious loop where we move the previousCount to our starting position so our previous will always be 0 index and our current in 1
-  if (prevCount[1] !== count) {
-    setPrevCount([prevCount[1], count]);
-  }
+  const prev = usePrevious(count);
 
   // we can make direction 1 or -1 instead of increasing / decreasing so we dont have to do ternary operators.
   // initial: (direction)=>({x: direction * 100}) instead of this: initial: (direction)=>({x: direction === "increasing" ? 100 : -100})
-  const direction = prevCount[0] < count ? 1 : -1;
+  const direction = prev < count ? 1 : -1;
 
-  console.log(prevCount, direction, width);
+  console.log(prev, direction, width);
 
   return (
     <Box>
@@ -43,7 +37,7 @@ const Carousel = () => {
           justify={"center"}
           align={"center"}
           h={"44"}
-          w={"44"}
+          w="container.sm"
           position="relative"
           backgroundColor="blackAlpha.600"
           // we dont want the child to overflow out when transition happens
@@ -93,4 +87,16 @@ let motionVariant = {
   initial: ({ direction, width }) => ({ x: direction * width }),
   animate: { x: 0 },
   exit: ({ direction, width }) => ({ x: direction * -width }),
+};
+
+export const usePrevious = (state) => {
+  // store previous count without using ref + useEffect
+  const [prev, setPrev] = useState([null, state]);
+
+  // a continious loop where we move the previousCount to our starting position so our previous will always be 0 index and our current in 1
+  if (state !== prev[1]) {
+    setPrev([prev[1], state]);
+  }
+
+  return prev[0];
 };
