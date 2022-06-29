@@ -72,7 +72,7 @@ export const reduceData = (reminders) => {
 export const useReduceDataQuery = () => {
   const router = useRouter();
   const { query } = router;
-  return useQuery(["firebaseData", query.tab ? querytab : 0], () =>
+  return useQuery(["firebaseData", query.tab ? query.tab : 0], () =>
     reduceData()
   );
 };

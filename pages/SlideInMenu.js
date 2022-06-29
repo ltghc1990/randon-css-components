@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
+import { useElementWidth } from "../hooks/useElementWidth";
+
 import Link from "next/link";
 
 const navigation = [
@@ -77,13 +79,15 @@ const SlideInMenu = () => {
 };
 
 const Sidebar = ({ isOpen }) => {
+  const [elementRef, width] = useElementWidth();
   const menuSetting = isOpen
     ? { opacity: 1, left: "0px", transition: { duration: 0.3 } }
-    : { opacity: 0, left: "-100px" };
+    : { opacity: 0, left: -width, transition: { duration: 0.3 } };
   console.log(menuSetting);
 
   return (
     <motion.ul
+      ref={elementRef}
       initial={false}
       animate={menuSetting}
       className={

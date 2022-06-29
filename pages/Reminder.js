@@ -14,6 +14,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const Reminder = () => {
   const [toggleReminder, setToggleReminder] = useBooleanHook();
+
+  // for sidebar open or close
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure({
     defaultIsOpen: true,
   });
